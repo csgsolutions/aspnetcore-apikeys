@@ -1,0 +1,26 @@
+<Project>
+  <Import Project="$(DotNetRestoreSourcePropsPath)" Condition="'$(DotNetRestoreSourcePropsPath)' != ''"/>
+  <PropertyGroup Label="RestoreSources">
+    <RestoreSources>$(DotNetRestoreSources)</RestoreSources>
+    <RestoreSources Condition="'$(EnableCsgDevRestoreSources)' == 'true'">
+      $(RestoreSources);
+      https://www.myget.org/F/csgsolutions-dev/api/v3/index.json;
+    </RestoreSources>
+    <RestoreSources Condition="'$(EnableCsgDevRestoreSources)' == 'true'">
+      $(RestoreSources);
+      https://nuget-dev.corp.csgsolutions.com/nuget;
+    </RestoreSources>
+    <RestoreSources>
+      $(RestoreSources);
+      https://www.myget.org/F/csgsolutions/api/v3/index.json;
+    </RestoreSources>
+    <RestoreSources>
+      $(RestoreSources);
+      https://nuget.corp.csgsolutions.com/nuget;
+    </RestoreSources>
+    <RestoreSources>
+      $(RestoreSources);
+      https://api.nuget.org/v3/index.json;
+    </RestoreSources>
+  </PropertyGroup>
+</Project>
