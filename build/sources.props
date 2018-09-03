@@ -2,6 +2,10 @@
   <Import Project="$(DotNetRestoreSourcePropsPath)" Condition="'$(DotNetRestoreSourcePropsPath)' != ''"/>
   <PropertyGroup Label="RestoreSources">
     <RestoreSources>$(DotNetRestoreSources)</RestoreSources>
+    <RestoreSources Condition="'$(EnableCsgDevRestoreSources)' == 'true'">
+      $(RestoreSources);
+      https://www.myget.org/F/csgsolutions-dev/api/v3/index.json;
+    </RestoreSources>
     <RestoreSources>
       $(RestoreSources);
       https://www.myget.org/F/csgsolutions/api/v3/index.json;
