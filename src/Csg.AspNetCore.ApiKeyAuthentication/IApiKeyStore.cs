@@ -7,7 +7,7 @@ namespace Csg.AspNetCore.ApiKeyAuthentication
 {
     public interface IApiKeyStore
     {
-        Task<ApiKey> GetKeyAsync(string keyName);
+        Task<ApiKey> GetKeyAsync(string clientID);
 
         bool SupportsClaims { get; }
 

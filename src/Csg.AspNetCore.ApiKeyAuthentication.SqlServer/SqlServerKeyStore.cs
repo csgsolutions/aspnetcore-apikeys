@@ -15,6 +15,12 @@ namespace Csg.AspNetCore.ApiKeyAuthentication.SqlServer
 
         public bool EnableClaimsStore { get; set; } = false;
 
+        public bool SupportsClaims => this.EnableClaimsStore;
+
+        public string SelectKeyByClientIdQuery { get; set; } = "SELECT [ClientID], [Secret] FROM [ApiKey] WHERE [ClientID] = @clientID;";
+
+        public string SelectClaimsByClientIdQuery { get; set; } = "";
+ 
         public SqlServerKeyStore(string connectionString)
         {
             _connectionString = connectionString;
@@ -29,28 +35,20 @@ namespace Csg.AspNetCore.ApiKeyAuthentication.SqlServer
             return conn;
         }
 
-        public async Task<ApiKey> GetKeyAsync(string keyName)
+        public async Task<ApiKey> GetKeyAsync(string clientID)
         {
             using (var conn = await OpenConnectionAsync())
             {
-                return await conn.QuerySingleAsync<ApiKey>("SELECT [KeyName], [Secret] FROM [ApiKey] WHERE [KeyName] = @keyName;", new
+                return await conn.QuerySingleAsync<ApiKey>(this.SelectKeyByClientIdQuery, new
                 {
-                    keyName
+                    clientID
                 });
             }
         }
 
         public async Task<ICollection<Claim>> GetClaimsAsync(ApiKey key)
         {
-            var defaultClaim = new System.Security.Claims.Claim(ClaimTypes.Name, key.ClientID);
-            var claims = new List<Claim>();
-
-            if (!this.EnableClaimsStore)
-            {
-                claims.Add(defaultClaim);
-            }
-
-            return claims;
+            throw new NotImplementedException();
 
             //using (var conn = await OpenConnectionAsync())
             //{
