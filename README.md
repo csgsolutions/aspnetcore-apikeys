@@ -1,5 +1,7 @@
 # Introduction 
-This repository is a skeleton of an application
+A server-side and client-side library for API key authentication with ASP.NET core.
+
+[![Build status](https://ci.appveyor.com/api/projects/status/mrrmn9glibm3484n/branch/master?svg=true)](https://ci.appveyor.com/project/jusbuc2k/aspnetcore-apikeys/branch/master)
 
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
