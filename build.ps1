@@ -16,7 +16,7 @@ Param(
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $OutputPackages = @(
-	".\src\Classlib\ClassLib.csproj"
+	".\src\Csg.AspNetCore.ApiKeyAuthentication\Csg.AspNetCore.ApiKeyAuthentication.csproj"
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
 
