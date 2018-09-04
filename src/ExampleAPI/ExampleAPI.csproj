@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Csg.AspNetCore.ApiKeyAuthentication\Csg.AspNetCore.ApiKeyAuthentication.csproj" />
+    <ProjectReference Include="..\Csg.AspNetCore.Authentication.ApiKey\Csg.AspNetCore.Authentication.ApiKey.csproj" />
   </ItemGroup>
 
 </Project>

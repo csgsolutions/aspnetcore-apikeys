@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>HttpClient extensions for calling APIs secured with Csg.AspNetCore.Authentication.ApiKey authentication.</Description>
+    <PackageId>Csg.AspNetCore.Authentication.ApiKey.Client</PackageId>
+  </PropertyGroup>
+
+</Project>

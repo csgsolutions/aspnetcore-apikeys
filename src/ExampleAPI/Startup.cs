@@ -56,9 +56,9 @@ namespace ExampleAPI
                 };
             });
 
-            services.AddAuthentication(Csg.AspNetCore.ApiKeyAuthentication.ApiKeyDefaults.Name).AddApiKey(config =>
+            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey(config =>
             {
-
+                //config.KeyValidator = new Csg.AspNetCore.Authentication.ApiKey.TimeBasedApiKeyValidator();
             });
 
             services.AddMvc();
