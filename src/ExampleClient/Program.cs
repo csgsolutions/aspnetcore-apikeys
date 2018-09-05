@@ -12,7 +12,7 @@ namespace ExampleClient
 
             var client = new System.Net.Http.HttpClient();
 
-            string clientID = "Key1";
+            string clientID = "Client1";
             string secret = "secret1234";
 
 
