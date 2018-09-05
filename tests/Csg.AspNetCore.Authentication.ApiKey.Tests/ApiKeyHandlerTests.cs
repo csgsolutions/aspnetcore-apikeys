@@ -82,7 +82,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         }
 
         [TestMethod]
-        public void ApiKeyHandler_HandleRequestWithValidToken()
+        public void ApiKeyHandler_HandleRequestWithValidStaticToken()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
@@ -97,14 +97,14 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         }
 
         [TestMethod]
-        public void ApiKeyHandler_HandleRequestWithValidToken2()
+        public void ApiKeyHandler_HandleRequestWithValidTimeBasedToken()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
             var gen = new Csg.AspNetCore.Authentication.ApiKey.TimeBasedTokenGenerator();
 
-            var token = gen.GenerateToken("TestName", "TestKey", DateTimeOffset.UtcNow);
+            var token = System.Net.WebUtility.UrlEncode(gen.GenerateToken("TestName", "TestKey", DateTimeOffset.UtcNow));
 
             context.Request.Headers.Add("Authorization", $"TApiKey TestName:{token}");
 
