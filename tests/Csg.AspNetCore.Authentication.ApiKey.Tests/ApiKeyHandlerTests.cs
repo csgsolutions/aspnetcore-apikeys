@@ -9,19 +9,19 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
     {
         private const string HEADER = "Authorization";
         private const string ValidHeaderValue = "key app_name:key_value";
+        private static readonly MockClock Clock = new MockClock() { UtcNow = new DateTimeOffset(2015, 09, 25, 00, 00, 00, TimeSpan.Zero) };
 
         private ApiKeyHandler CreateHandler(HttpContext context)
         {
             var keyStore = new FakeKeyStore();
             var options = new FakeOptionsMonitor<ApiKeyOptions>() { CurrentValue = new ApiKeyOptions() };
             var logger = new FakeLoggerFactory();
-            var clock = new Microsoft.AspNetCore.Authentication.SystemClock();
 
             var b = new Microsoft.AspNetCore.Authentication.AuthenticationSchemeBuilder(ApiKeyDefaults.Name);
             b.HandlerType = typeof(ApiKeyHandler);
             b.DisplayName = "API Key";
             
-            var handler = new ApiKeyHandler(keyStore, options, logger, System.Text.Encodings.Web.UrlEncoder.Default, clock);
+            var handler = new ApiKeyHandler(keyStore, options, logger, System.Text.Encodings.Web.UrlEncoder.Default, Clock);
 
             handler.InitializeAsync(b.Build(), context).ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -104,7 +104,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var handler = CreateHandler(context);
             var gen = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
 
-            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(gen.ComputeToken("TestName", "TestKey", DateTimeOffset.UtcNow));
+            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(gen.ComputeToken("TestName", "TestKey", Clock.UtcNow));
 
             context.Request.Headers.Add("Authorization", $"TAPIKEY TestName:{token}");
 
@@ -113,6 +113,23 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.AreEqual(true, authResult.Succeeded);
             Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
             Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithOutOfRangeTimeBasedToken()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+            var gen = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
+
+            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(gen.ComputeToken("TestName", "TestKey", Clock.UtcNow.AddSeconds(120)));
+
+            context.Request.Headers.Add("Authorization", $"TAPIKEY TestName:{token}");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(false, authResult.Succeeded);
+            Assert.IsNull(authResult.Principal);
         }
 
         [TestMethod]
@@ -152,7 +169,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 
             Assert.IsTrue(authResult.Principal.HasClaim(x => x.Type == "Foo"));
         }
-
 
     }
 }

@@ -30,7 +30,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
         public int TimeBasedKeyInterval { get; set; } = 60;
 
-        public int TimeBasedKeyTolerance { get; set; } = 2;
+        public int TimeBasedKeyTolerance { get; set; } = 1;
         
         public ApiKeyOptions() : base()
         {

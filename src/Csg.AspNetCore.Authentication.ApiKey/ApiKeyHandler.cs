@@ -116,6 +116,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 keyValidator = keyValidator ?? new TimeBasedApiKeyValidator(this.Clock, new Csg.ApiKeyGenerator.TimeBasedTokenGenerator()
                 {
                     IntervalSeconds = this.Options.TimeBasedKeyInterval,
+                    AllowedNumberOfDriftIntervals = this.Options.TimeBasedKeyTolerance
                 });
             }
             else if (keyValidator == null)

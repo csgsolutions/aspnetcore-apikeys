@@ -6,13 +6,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 {
     public class MockClock : Microsoft.AspNetCore.Authentication.ISystemClock
     {
-        private readonly DateTimeOffset _utcNow;
-
-        public MockClock(DateTimeOffset utcNow)
+        public MockClock()
         {
-            _utcNow = utcNow;
+            this.UtcNow = DateTimeOffset.UtcNow;
         }
 
-        public DateTimeOffset UtcNow => _utcNow;
+        public DateTimeOffset UtcNow { get; set; }
     }
 }
