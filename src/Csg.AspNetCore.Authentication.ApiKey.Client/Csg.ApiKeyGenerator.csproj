@@ -4,7 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>HttpClient extensions for calling APIs secured with Csg.AspNetCore.Authentication.ApiKey authentication.</Description>
-    <PackageId>Csg.AspNetCore.Authentication.ApiKey.Client</PackageId>
+    <PackageId>Csg.ApiKeyGenerator</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.1.0" />
+  </ItemGroup>
 
 </Project>

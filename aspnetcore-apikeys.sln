@@ -25,9 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.AspNetCore.Authenticati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.AspNetCore.Authentication.ApiKey.Tests", "tests\Csg.AspNetCore.Authentication.ApiKey.Tests\Csg.AspNetCore.Authentication.ApiKey.Tests.csproj", "{FB2761B1-886C-4E10-8A34-57E12F3E489F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleClient", "src\ExampleClient\ExampleClient.csproj", "{BDCCFBB5-E112-4B5E-8712-570DD916ACA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleClient", "src\ExampleClient\ExampleClient.csproj", "{BDCCFBB5-E112-4B5E-8712-570DD916ACA2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.AspNetCore.Authentication.ApiKey.Client", "src\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.AspNetCore.Authentication.ApiKey.Client.csproj", "{2DA7B93E-68D2-42E2-B614-22A7C39CF677}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ApiKeyGenerator", "src\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.ApiKeyGenerator.csproj", "{2DA7B93E-68D2-42E2-B614-22A7C39CF677}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,7 +45,6 @@ Global
 		{AC397B5C-CC4D-4E52-8DA8-0591F54F530C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AC397B5C-CC4D-4E52-8DA8-0591F54F530C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC397B5C-CC4D-4E52-8DA8-0591F54F530C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC397B5C-CC4D-4E52-8DA8-0591F54F530C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB2761B1-886C-4E10-8A34-57E12F3E489F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB2761B1-886C-4E10-8A34-57E12F3E489F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB2761B1-886C-4E10-8A34-57E12F3E489F}.Release|Any CPU.ActiveCfg = Release|Any CPU

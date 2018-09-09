@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.AspNetCore.Authentication.ApiKey.Client.csproj" />
+    <ProjectReference Include="..\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.ApiKeyGenerator.csproj" />
   </ItemGroup>
 
 </Project>

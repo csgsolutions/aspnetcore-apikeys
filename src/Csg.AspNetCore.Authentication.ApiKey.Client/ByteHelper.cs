@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Text.Encodings.Web;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+namespace Csg.ApiKeyGenerator
 {
-    internal static class ByteHelper
+    public static class TokenCompareHelper
     {
-        public static bool AreArraysEqual(byte[] a, byte[] b)
+        public static bool AreTokensEqual(byte[] a, byte[] b)
         {
             if (a.Length != b.Length)
                 return false;
@@ -25,6 +27,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             }
 
             return result;
-        }    
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
     [TestClass]
     public class ApiKeyHandlerTests
     {
+        private const string HEADER = "Authorization";
         private const string ValidHeaderValue = "key app_name:key_value";
 
         private ApiKeyHandler CreateHandler(HttpContext context)
@@ -45,7 +46,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            context.Request.Headers.Add("Authorization", "TestNameMissingType");
+            context.Request.Headers.Add(HEADER, "AuthTypeNotHandled");
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             Assert.AreEqual(false, authResult.Succeeded);
@@ -58,7 +59,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            context.Request.Headers.Add("Authorization", "ApiKey TestNameMissingClient");
+            context.Request.Headers.Add(HEADER, "APIKEY ClienIDWithoutKey");
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             Assert.AreEqual(false, authResult.Succeeded);
@@ -72,7 +73,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            context.Request.Headers.Add("Authorization", "ApiKey TestName:NotValidValue");
+            context.Request.Headers.Add(HEADER, "ApiKey ClientID:InvalidSecret");
 
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -101,12 +102,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
+            var gen = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
 
-            var gen = new Csg.AspNetCore.Authentication.ApiKey.TimeBasedTokenGenerator();
+            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(gen.ComputeToken("TestName", "TestKey", DateTimeOffset.UtcNow));
 
-            var token = System.Net.WebUtility.UrlEncode(gen.GenerateToken("TestName", "TestKey", DateTimeOffset.UtcNow));
-
-            context.Request.Headers.Add("Authorization", $"TApiKey TestName:{token}");
+            context.Request.Headers.Add("Authorization", $"TAPIKEY TestName:{token}");
 
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -115,25 +115,8 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
         }
 
-        //[TestMethod]
-        //public void ApiKeyHandler_HandleRequestWithValidTokenFromAlternateHeader()
-        //{
-        //    var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
-        //    var handler = CreateHandler(context);
-
-        //    handler.Options.HeaderName = "API-Key";
-
-        //    context.Request.Headers.Add("API-Key", "TestName:TestKey");
-
-        //    var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-        //    Assert.AreEqual(true, authResult.Succeeded);
-        //    Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
-        //    Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
-        //}
-
         [TestMethod]
-        public void ApiKeyHandler_HandleRequestWithCustomTokenProvider()
+        public void ApiKeyHandler_OnRequestEvent()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
@@ -150,6 +133,24 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.AreEqual(true, authResult.Succeeded);
             Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
             Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
+        public void ApiKeyHandler_AuthenticatedEvent()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            handler.Options.Events.OnAuthenticatedAsync = async (ctx) =>
+            {
+                ctx.Identity.AddClaim(new System.Security.Claims.Claim("Foo", "Bar"));
+            };
+
+            context.Request.Headers.Add("Authorization", "ApiKey TestName:TestKey");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.IsTrue(authResult.Principal.HasClaim(x => x.Type == "Foo"));
         }
 
 

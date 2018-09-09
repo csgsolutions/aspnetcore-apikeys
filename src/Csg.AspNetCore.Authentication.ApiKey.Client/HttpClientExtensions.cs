@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Csg.AspNetCore.Authentication.ApiKey;
+using Csg.ApiKeyGenerator;
 
 namespace System.Net.Http
 {
@@ -14,51 +14,35 @@ namespace System.Net.Http
             string clientID, 
             string secret, 
             DateTimeOffset utcNow,
-            TimeBasedTokenGenerator tokenGenerator = null,
-            string authenticationType = "TApiKey")
+            TimeBasedTokenGenerator tokenGenerator = null)
         {
-            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret, utcNow, tokenGenerator, authenticationType);  
+            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret, utcNow, tokenGenerator);  
         }
 
         public static void AddApiKeyAuthorizationHeader(this System.Net.Http.Headers.HttpRequestHeaders headers, 
             string clientID, 
             string secret, 
             DateTimeOffset utcNow, 
-            TimeBasedTokenGenerator tokenGenerator = null,
-            string authenticationType = "TApiKey")
+            TimeBasedTokenGenerator tokenGenerator = null)
         {
             tokenGenerator = tokenGenerator ?? _defaultTokenGenerator;
 
-            if (headers.Contains(Authorization))
-            {
-                headers.Remove(Authorization);
-            }
+            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(tokenGenerator.ComputeToken(clientID, secret, utcNow));
 
-            var token = tokenGenerator.GenerateToken(clientID, secret, utcNow);
-
-            token = System.Net.WebUtility.UrlEncode(token);
-
-            headers.Add("Authorization", $"{authenticationType} {clientID}:{token}");
+            headers.Add("Authorization", $"TAPIKEY {clientID}:{token}");
         }
 
-        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.Headers.HttpRequestHeaders headers, string clientID, string secret, string authenticationType = "ApiKey")
+        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.Headers.HttpRequestHeaders headers, string clientID, string secret)
         {
-            if (headers.Contains(Authorization))
-            {
-                headers.Remove(Authorization);
-            }
-
             secret = System.Net.WebUtility.UrlEncode(secret);
-
-            headers.Add("Authorization", $"{authenticationType} {clientID}:{secret}");
+            headers.Add("Authorization", $"APIKEY {clientID}:{secret}");
         }
 
         public static void AddApiKeyAuthorizationHeader(this System.Net.Http.HttpClient client,
             string clientID,
-            string secret,
-            string authenticationType = "ApiKey")
+            string secret)
         {
-            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret, authenticationType);
+            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret);
         }
 
     }
