@@ -8,6 +8,8 @@ A server-side and client-side library for API key authentication with ASP.NET co
 | Package | NuGet Stable | NuGet Pre-release | MyGet Dev |
 | ------- | ------------ | ----------------- | --------- |
 | Csg.AspNetCore.Authentication.ApiKey | n/a | n/a | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.AspNetCore.Authentication.ApiKey) |
+| Csg.ApiKeyGenerator | n/a | n/a | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.ApiKeyGenerator) |
+
 
 # Getting Started
 1.	Install nuget package
