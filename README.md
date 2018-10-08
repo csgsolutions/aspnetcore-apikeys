@@ -62,7 +62,7 @@ static void Main(string[] args)
     var client = new System.Net.Http.HttpClient();
 
     Console.WriteLine("Calling an API using a static API key");
-    client.AddApiKeyAuthorizationHeader(clientID, secret);
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ApiKey", clientID+":"+secret);
     var response = client.GetAsync("http://localhost:5001/api/echo/HelloWorld").ConfigureAwait(false).GetAwaiter().GetResult();
     Console.WriteLine($"Response Code: {response.StatusCode}");
     var content = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
