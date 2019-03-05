@@ -98,6 +98,21 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         }
 
         [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithValidStaticTokenAlternateCase()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            context.Request.Headers.Add("Authorization", "ApiKey testNAME:TestKey");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(true, authResult.Succeeded);
+            Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
+            Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
         public void ApiKeyHandler_HandleRequestWithValidTimeBasedToken()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
@@ -168,6 +183,23 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             Assert.IsTrue(authResult.Principal.HasClaim(x => x.Type == "Foo"));
+        }
+
+        [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithHttpBasic()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+            var gen = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
+            var value = Convert.ToBase64String(System.Text.UTF8Encoding.UTF8.GetBytes($"TestName:TestKey"));
+
+            context.Request.Headers.Add("Authorization", $"Basic {value}");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(true, authResult.Succeeded);
+            Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
+            Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
         }
 
     }

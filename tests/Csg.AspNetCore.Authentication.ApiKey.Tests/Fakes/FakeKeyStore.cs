@@ -17,7 +17,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 
         public Task<ApiKey> GetKeyAsync(string keyName)
         {
-            if (keyName == "TestName")
+            if (keyName.Equals("TestName", StringComparison.OrdinalIgnoreCase))
             {
                 return Task.FromResult(new ApiKey() { ClientID = "TestName", Secret = "TestKey" });
             }

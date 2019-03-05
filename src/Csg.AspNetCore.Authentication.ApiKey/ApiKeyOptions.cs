@@ -26,6 +26,8 @@ namespace Csg.AspNetCore.Authentication.ApiKey
         
         public bool StaticKeyEnabled { get; set; } = true;
 
+        public bool HttpBasicEnabled { get; set; } = true;
+
         public bool TimeBasedKeyEnabled { get; set; } = true;
 
         public int TimeBasedKeyInterval { get; set; } = 60;

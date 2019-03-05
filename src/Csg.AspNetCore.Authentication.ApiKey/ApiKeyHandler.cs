@@ -13,6 +13,10 @@ namespace Csg.AspNetCore.Authentication.ApiKey
     public class ApiKeyHandler : Microsoft.AspNetCore.Authentication.AuthenticationHandler<ApiKeyOptions>
     {
         private const string AuthorizationHeader = "Authorization";
+        private const string AuthTypeBasic = "Basic";
+        private const string AuthTypeApiKey = "ApiKey";
+        private const string AuthTypeTApiKey = "TApiKey";
+
         private readonly IApiKeyStore _keyStore;
         
         public ApiKeyHandler(IApiKeyStore keyStore, IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
@@ -31,6 +35,9 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             var rawHeader = headerValue[0].AsSpan();
             var indexOfFirstSpace = rawHeader.IndexOf(' ');
             var indexOfFirstColon = rawHeader.IndexOf(':');
+            var SAuthTypeBasic = AuthTypeBasic.AsSpan();
+            var SAuthTypeApiKey = AuthTypeApiKey.AsSpan();
+            var SAuthTypeTApiKey = AuthTypeTApiKey.AsSpan();
 
             if (indexOfFirstSpace <= 0)
             {
@@ -38,11 +45,15 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 return;
             }
 
-            string authType = rawHeader.Slice(0, indexOfFirstSpace).ToString();
+            var authType = rawHeader.Slice(0, indexOfFirstSpace);
 
-            if (!(authType.Equals("ApiKey", StringComparison.OrdinalIgnoreCase) || authType.Equals("TApiKey", StringComparison.OrdinalIgnoreCase)))
+            if (authType.Equals(SAuthTypeBasic, StringComparison.OrdinalIgnoreCase))
             {
-                messageContext.NoResult();
+                string decodedValue = System.Text.UTF8Encoding.UTF8.GetString(Convert.FromBase64String(rawHeader.Slice(indexOfFirstSpace + 1).ToString()));
+                var parts = decodedValue.Split(':');
+                messageContext.ClientID = parts[0];
+                messageContext.Token = parts[1];
+                messageContext.AuthenticationType = authType.ToString();
                 return;
             }
 
@@ -52,9 +63,15 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 return;
             }
 
-            messageContext.ClientID = rawHeader.Slice(indexOfFirstSpace + 1, indexOfFirstColon-indexOfFirstSpace-1).ToString();
-            messageContext.Token = rawHeader.Slice(indexOfFirstColon+1).ToString();
-            messageContext.AuthenticationType = authType;
+            if (authType.Equals(SAuthTypeApiKey, StringComparison.OrdinalIgnoreCase) || authType.Equals(SAuthTypeTApiKey, StringComparison.OrdinalIgnoreCase))
+            {
+                messageContext.ClientID = rawHeader.Slice(indexOfFirstSpace + 1, indexOfFirstColon - indexOfFirstSpace - 1).ToString();
+                messageContext.Token = rawHeader.Slice(indexOfFirstColon + 1).ToString();
+                messageContext.AuthenticationType = authType.ToString();
+                return;
+            }
+
+            messageContext.NoResult();
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -95,7 +112,17 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
             var keyValidator = this.Options.KeyValidator;
 
-            if (requestMessage.AuthenticationType.Equals("APIKEY", StringComparison.OrdinalIgnoreCase))
+            if (requestMessage.AuthenticationType.Equals(AuthTypeBasic, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!this.Options.HttpBasicEnabled)
+                {
+                    this.Logger.LogInformation($"The client specified an authentication type '{requestMessage.AuthenticationType}' that is not enabled.");
+                    return AuthenticateResult.Fail("Invalid authentication type");
+                }
+
+                keyValidator = keyValidator ?? new DefaultApiKeyValidator();
+            }
+            else if (requestMessage.AuthenticationType.Equals("APIKEY", StringComparison.OrdinalIgnoreCase))
             {
                 if (!this.Options.StaticKeyEnabled)
                 {
