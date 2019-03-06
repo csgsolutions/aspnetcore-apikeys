@@ -17,6 +17,10 @@ namespace Csg.AspNetCore.Authentication.ApiKey
         private const string AuthTypeApiKey = "ApiKey";
         private const string AuthTypeTApiKey = "TApiKey";
 
+        private const string InvalidAuthHeaderMessage = "Invalid authorization header";
+        private const string InvalidApiKeyMessage = "Invalid API Key";
+        private const string InvalidClientMessage = "Invalid ClientID";
+
         private readonly IApiKeyStore _keyStore;
         
         public ApiKeyHandler(IApiKeyStore keyStore, IOptionsMonitor<ApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
@@ -34,10 +38,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
             var rawHeader = headerValue[0].AsSpan();
             var indexOfFirstSpace = rawHeader.IndexOf(' ');
-            var indexOfFirstColon = rawHeader.IndexOf(':');
-            var SAuthTypeBasic = AuthTypeBasic.AsSpan();
-            var SAuthTypeApiKey = AuthTypeApiKey.AsSpan();
-            var SAuthTypeTApiKey = AuthTypeTApiKey.AsSpan();
 
             if (indexOfFirstSpace <= 0)
             {
@@ -45,29 +45,43 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 return;
             }
 
+            var SAuthTypeBasic = AuthTypeBasic.AsSpan();
+            var SAuthTypeApiKey = AuthTypeApiKey.AsSpan();
+            var SAuthTypeTApiKey = AuthTypeTApiKey.AsSpan();
             var authType = rawHeader.Slice(0, indexOfFirstSpace);
 
-            if (authType.Equals(SAuthTypeBasic, StringComparison.OrdinalIgnoreCase))
+            if (this.Options.HttpBasicEnabled && authType.Equals(SAuthTypeBasic, StringComparison.OrdinalIgnoreCase))
             {
-                string decodedValue = System.Text.UTF8Encoding.UTF8.GetString(Convert.FromBase64String(rawHeader.Slice(indexOfFirstSpace + 1).ToString()));
-                var parts = decodedValue.Split(':');
-                messageContext.ClientID = parts[0];
-                messageContext.Token = parts[1];
-                messageContext.AuthenticationType = authType.ToString();
+                this.Logger.LogDebug($"HTTP Basic authentication detected.");
+
+                var valueEncoded = rawHeader.Slice(indexOfFirstSpace + 1);
+                var valueDecoded = System.Text.UTF8Encoding.UTF8.GetString(Convert.FromBase64CharArray(valueEncoded.ToArray(), 0, valueEncoded.Length)).AsSpan();
+                var split = valueDecoded.IndexOf(':');
+
+                messageContext.ClientID = valueDecoded.Slice(0, split).ToString();
+                messageContext.Token = valueDecoded.Slice(split + 1).ToString();
+                messageContext.AuthenticationType = AuthTypeBasic;
+
                 return;
             }
-
-            if (indexOfFirstColon <= 0)
+                       
+            if ((this.Options.TimeBasedKeyEnabled && authType.Equals(SAuthTypeApiKey, StringComparison.OrdinalIgnoreCase))
+                || (this.Options.StaticKeyEnabled && authType.Equals(SAuthTypeTApiKey, StringComparison.OrdinalIgnoreCase)))
             {
-                messageContext.Fail("Invalid authorization header");
-                return;
-            }
+                this.Logger.LogDebug($"Authorization {authType.ToString()} detected.");
 
-            if (authType.Equals(SAuthTypeApiKey, StringComparison.OrdinalIgnoreCase) || authType.Equals(SAuthTypeTApiKey, StringComparison.OrdinalIgnoreCase))
-            {
+                var indexOfFirstColon = rawHeader.IndexOf(':');
+
+                if (indexOfFirstColon <= 0)
+                {
+                    messageContext.Fail(InvalidAuthHeaderMessage);
+                    return;
+                }
+
                 messageContext.ClientID = rawHeader.Slice(indexOfFirstSpace + 1, indexOfFirstColon - indexOfFirstSpace - 1).ToString();
                 messageContext.Token = rawHeader.Slice(indexOfFirstColon + 1).ToString();
                 messageContext.AuthenticationType = authType.ToString();
+
                 return;
             }
 
@@ -82,6 +96,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
             if (requestMessage.Result != null)
             {
+                this.Logger.LogDebug("Using the result returned from the OnRequestAsync event.");
                 return requestMessage.Result;
             }
 
@@ -99,7 +114,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             if (requestMessage?.ClientID == null)
             {
                 this.Logger.LogDebug("ClientID not provided or is malformed.");
-                return AuthenticateResult.Fail("Client is not valid.");
+                return AuthenticateResult.Fail(InvalidClientMessage);
             }
 
             var keyFromStore = await _keyStore.GetKeyAsync(requestMessage.ClientID);
@@ -107,39 +122,21 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             if (keyFromStore == null)
             {
                 this.Logger.LogInformation("An API key could not be found for the given ClientID.");
-                return AuthenticateResult.Fail("Invalid ClientID");
+                return AuthenticateResult.Fail(InvalidClientMessage);
             }
 
             var keyValidator = this.Options.KeyValidator;
 
             if (requestMessage.AuthenticationType.Equals(AuthTypeBasic, StringComparison.OrdinalIgnoreCase))
             {
-                if (!this.Options.HttpBasicEnabled)
-                {
-                    this.Logger.LogInformation($"The client specified an authentication type '{requestMessage.AuthenticationType}' that is not enabled.");
-                    return AuthenticateResult.Fail("Invalid authentication type");
-                }
-
                 keyValidator = keyValidator ?? new DefaultApiKeyValidator();
             }
-            else if (requestMessage.AuthenticationType.Equals("APIKEY", StringComparison.OrdinalIgnoreCase))
+            else if (requestMessage.AuthenticationType.Equals(AuthTypeApiKey, StringComparison.OrdinalIgnoreCase))
             {
-                if (!this.Options.StaticKeyEnabled)
-                {
-                    this.Logger.LogInformation($"The client specified an authentication type '{requestMessage.AuthenticationType}' that is not enabled.");
-                    return AuthenticateResult.Fail("Invalid authentication type");
-                }
-
                 keyValidator = keyValidator ?? new DefaultApiKeyValidator();
             }
-            else if (requestMessage.AuthenticationType.Equals("TAPIKEY", StringComparison.OrdinalIgnoreCase))
+            else if (requestMessage.AuthenticationType.Equals(AuthTypeTApiKey, StringComparison.OrdinalIgnoreCase))
             {
-                if (!this.Options.TimeBasedKeyEnabled)
-                {
-                    this.Logger.LogInformation($"The client specified an authentication type '{requestMessage.AuthenticationType}' that is not enabled.");
-                    return AuthenticateResult.Fail("Invalid authentication type");
-                }
-
                 keyValidator = keyValidator ?? new TimeBasedApiKeyValidator(this.Clock, new Csg.ApiKeyGenerator.TimeBasedTokenGenerator()
                 {
                     IntervalSeconds = this.Options.TimeBasedKeyInterval,
@@ -153,11 +150,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
             if (!(await keyValidator.ValidateKeyAsync(keyFromStore, requestMessage.Token)))
             {
-                this.Logger.LogInformation("The provided API key is not valid.");
-                return AuthenticateResult.Fail("Invalid API Key");
+                this.Logger.LogInformation($"The ClientID and Key pair provided in the request ({requestMessage.ClientID}, {requestMessage.Token}) is not valid.");
+                return AuthenticateResult.Fail(InvalidApiKeyMessage);
             }
 
-            var userResult = await CreateUserAsync(keyFromStore);
+            var userResult = await CreateIdentityAsync(keyFromStore);
             
             if (userResult.Result != null)
             {
@@ -167,7 +164,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             return AuthenticateResult.Success(new AuthenticationTicket(new System.Security.Claims.ClaimsPrincipal(userResult.Identity), this.Scheme.Name));
         }
 
-        private async Task<AuthenticatedEventContext> CreateUserAsync(ApiKey key)
+        private async Task<AuthenticatedEventContext> CreateIdentityAsync(ApiKey key)
         {
             var claims = new List<System.Security.Claims.Claim>();
 

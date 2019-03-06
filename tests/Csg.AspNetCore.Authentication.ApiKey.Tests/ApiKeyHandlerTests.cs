@@ -131,6 +131,24 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         }
 
         [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithValidTimeBasedTokenAlternateCase()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+            var gen = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
+
+            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(gen.ComputeToken("testNAME", "TestKey", Clock.UtcNow));
+
+            context.Request.Headers.Add("Authorization", $"TAPIKEY testNAME:{token}");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(true, authResult.Succeeded);
+            Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
+            Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
         public void ApiKeyHandler_HandleRequestWithOutOfRangeTimeBasedToken()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();

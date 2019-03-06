@@ -9,7 +9,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
     [TestClass]
     public class TimeBasedTokenGeneratorTests
     {
-        private int IntervalSeconds = 60;
         private const string ClientID = "Client1";
         private const string ClientSecret = "secret";
         private static DateTimeOffset TokenDateTime = new DateTimeOffset(2015, 09, 25, 0, 0, 00, TimeSpan.Zero);
