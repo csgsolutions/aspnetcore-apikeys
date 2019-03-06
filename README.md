@@ -24,7 +24,9 @@ appsettings.json example
 ```json
 {
   "ApiKeys": {
-    "Client1": "secret1234"
+	"Keys": {
+		"Client1": "secret1234"
+	}
   }
 }
 ```
@@ -33,8 +35,7 @@ Startup.cs example
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-
-    services.Configure<Csg.AspNetCore.Authentication.ApiKey.ConfigurationApiKeyStoreOptions>("ApiKeys", this.Configuration);
+    services.Configure<Csg.AspNetCore.Authentication.ApiKey.ConfigurationApiKeyStoreOptions>(this.Configuration.GetSection("ApiKeys"));
 
     services.AddConfigurationApiKeyStore();
 
@@ -79,5 +80,16 @@ static void Main(string[] args)
     Console.ReadKey();
 }
 ```
+
+# HTTP Basic Authentication
+The ClientID and Key value can be passed as the Username and Password in a standard HTTP Basic authentication header. You can disable this behavior by setting the ```HttpBasicEnabled``` option to false.
+
+```csharp
+services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey(conf =>
+{
+    conf.HttpBasicEnabled = false;
+});
+```
+
 # Build and Test
- 1. build.ps1 / build.cmd should build and run all tests
+ 1. build.ps1 / build.cmd will build and run all tests

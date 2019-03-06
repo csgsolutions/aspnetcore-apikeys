@@ -17,6 +17,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 
         public Task<ApiKey> GetKeyAsync(string clientID)
         {
+            if (_options.CurrentValue.Keys == null)
+            {
+                return Task.FromResult<ApiKey>(null);
+            }
+
             if(_options.CurrentValue.Keys.TryGetValue(clientID, out string secret))
             {
                 return Task.FromResult(new ApiKey() { ClientID = clientID, Secret = secret });
