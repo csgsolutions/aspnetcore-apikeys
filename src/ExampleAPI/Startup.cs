@@ -32,33 +32,41 @@ namespace ExampleAPI
                     Version = "1.0"
                 });
 
-                c.AddSecurityDefinition("ApiKey", new ApiKeyScheme
-                {
-                    Description = "Authorization header using the API Key scheme. Example: \"Authorization: ApiKey clientID:secret\"",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
-                });
+                //c.AddSecurityDefinition("ApiKey", new ApiKeyScheme
+                //{
+                //    Description = "Authorization header using the API Key scheme. Example: \"Authorization: ApiKey clientID:secret\"",
+                //    Name = "Authorization",
+                //    In = "header",
+                //    Type = "apiKey"
+                //});
 
-                c.AddSecurityDefinition("TApiKey", new ApiKeyScheme
+                //c.AddSecurityDefinition("TApiKey", new ApiKeyScheme
+                //{
+                //    Description = "Authorization header using the time-based API Key scheme. Example: \"Authorization: TApiKey clientID:token\"",
+                //    Name = "Authorization",
+                //    In = "header",
+                //    Type = "apiKey"
+                //});
+
+                c.AddSecurityDefinition("Basic", new Swashbuckle.AspNetCore.Swagger.BasicAuthScheme()
                 {
-                    Description = "Authorization header using the time-based API Key scheme. Example: \"Authorization: TApiKey clientID:token\"",
-                    Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
+                    Description = "Username is ClientID, password is key."
                 });
 
                 c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>()
                 {
-                    { "ApiKey", new string[]{ } }
+                    { "Basic", new string[]{ } }
                 });
             });
 
-            services.Configure<Csg.AspNetCore.Authentication.ApiKey.ConfigurationApiKeyStoreOptions>("ApiKeys", this.Configuration);
+            services.Configure<Csg.AspNetCore.Authentication.ApiKey.ConfigurationApiKeyStoreOptions>(this.Configuration.GetSection("ApiKeys"));
 
             services.AddConfigurationApiKeyStore();
 
-            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey();
+            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey(conf =>
+            {
+                conf.HttpBasicEnabled = false;
+            });
 
             services.AddMvc();
         }
