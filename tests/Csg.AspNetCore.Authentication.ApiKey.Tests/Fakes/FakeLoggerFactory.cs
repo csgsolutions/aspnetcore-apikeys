@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication.Tests
+namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 {
     public class FakeLoggerFactory : Microsoft.Extensions.Logging.ILoggerFactory
     {

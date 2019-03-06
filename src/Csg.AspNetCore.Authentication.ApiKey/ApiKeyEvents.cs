@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication
+namespace Csg.AspNetCore.Authentication.ApiKey
 {
     public class ApiKeyEvents
     {
         public Func<RequestMessageContext, Task> OnRequestAsync { get; set; } = context => Task.CompletedTask;
 
-        //public Func<AuthenticatedContext, Task> OnAuthenticatedAsync { get; set; } = context => Task.CompletedTask;
+        public Func<AuthenticatedEventContext, Task> OnAuthenticatedAsync { get; set; } = context => Task.CompletedTask;
     }
 
     //public class AuthenticatedContext : Microsoft.AspNetCore.Authentication.RemoteAuthenticationContext<ApiKeyOptions>

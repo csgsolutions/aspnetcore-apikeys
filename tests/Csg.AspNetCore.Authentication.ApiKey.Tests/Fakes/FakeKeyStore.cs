@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication.Tests
+namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 {
-    public class FakeKeyStore : Csg.AspNetCore.ApiKeyAuthentication.IApiKeyStore
+    public class FakeKeyStore : Csg.AspNetCore.Authentication.ApiKey.IApiKeyStore
     {
         public bool SupportsClaims => false;
 
@@ -17,7 +17,7 @@ namespace Csg.AspNetCore.ApiKeyAuthentication.Tests
 
         public Task<ApiKey> GetKeyAsync(string keyName)
         {
-            if (keyName == "TestName")
+            if (keyName.Equals("TestName", StringComparison.OrdinalIgnoreCase))
             {
                 return Task.FromResult(new ApiKey() { ClientID = "TestName", Secret = "TestKey" });
             }

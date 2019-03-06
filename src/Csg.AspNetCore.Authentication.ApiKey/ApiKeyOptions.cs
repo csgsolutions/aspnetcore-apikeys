@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication
+namespace Csg.AspNetCore.Authentication.ApiKey
 {
     public class ApiKeyOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
     {
@@ -22,8 +22,18 @@ namespace Csg.AspNetCore.ApiKeyAuthentication
             }
         }
 
-        public IApiKeyValidator KeyValidator { get; set; } = new DefaultApiKeyValidator();
+        public IApiKeyValidator KeyValidator { get; set; }
+        
+        public bool StaticKeyEnabled { get; set; } = true;
 
+        public bool HttpBasicEnabled { get; set; } = true;
+
+        public bool TimeBasedKeyEnabled { get; set; } = true;
+
+        public int TimeBasedKeyInterval { get; set; } = 60;
+
+        public int TimeBasedKeyTolerance { get; set; } = 1;
+        
         public ApiKeyOptions() : base()
         {
             this.Events = new ApiKeyEvents();

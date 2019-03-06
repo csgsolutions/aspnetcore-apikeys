@@ -34,7 +34,15 @@ namespace ExampleAPI
 
                 c.AddSecurityDefinition("ApiKey", new ApiKeyScheme
                 {
-                    Description = "Authorization header using the API Key scheme. Example: \"Authorization: ApiKey {token}\"",
+                    Description = "Authorization header using the API Key scheme. Example: \"Authorization: ApiKey clientID:secret\"",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+
+                c.AddSecurityDefinition("TApiKey", new ApiKeyScheme
+                {
+                    Description = "Authorization header using the time-based API Key scheme. Example: \"Authorization: TApiKey clientID:token\"",
                     Name = "Authorization",
                     In = "header",
                     Type = "apiKey"
@@ -46,20 +54,11 @@ namespace ExampleAPI
                 });
             });
 
+            services.Configure<Csg.AspNetCore.Authentication.ApiKey.ConfigurationApiKeyStoreOptions>("ApiKeys", this.Configuration);
 
-            services.AddConfigurationApiKeyStore(config =>
-            {
-                config.Keys = new Dictionary<string, string>()
-                {
-                    { "Key1", "secret1234" },
-                    { "Key2", "secret4567" }
-                };
-            });
+            services.AddConfigurationApiKeyStore();
 
-            services.AddAuthentication(Csg.AspNetCore.ApiKeyAuthentication.ApiKeyDefaults.Name).AddApiKey(config =>
-            {
-
-            });
+            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey();
 
             services.AddMvc();
         }

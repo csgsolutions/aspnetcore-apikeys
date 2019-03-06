@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication.Tests
+namespace Csg.AspNetCore.Authentication.ApiKey.Tests
 {
     public class FakeOptionsMonitor<T> : Microsoft.Extensions.Options.IOptionsMonitor<T>
     {

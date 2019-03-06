@@ -1,4 +1,4 @@
-﻿using Csg.AspNetCore.ApiKeyAuthentication;
+﻿using Csg.AspNetCore.Authentication.ApiKey;
 using Microsoft.AspNetCore.Authentication;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,6 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ApiKeyExtensions
     {
-
         public static void AddConfigurationApiKeyStore(this IServiceCollection services, Action<ConfigurationApiKeyStoreOptions> setupAction = null)
         {
             if (setupAction != null)

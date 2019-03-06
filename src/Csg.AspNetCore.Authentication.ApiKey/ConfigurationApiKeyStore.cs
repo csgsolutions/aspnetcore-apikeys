@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication
+namespace Csg.AspNetCore.Authentication.ApiKey
 {
     public class ConfigurationApiKeyStore : IApiKeyStore
     {

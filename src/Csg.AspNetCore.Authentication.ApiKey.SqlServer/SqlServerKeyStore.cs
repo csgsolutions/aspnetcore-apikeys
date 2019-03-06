@@ -7,7 +7,7 @@ using Dapper;
 using System.Linq;
 using System.Dynamic;
 
-namespace Csg.AspNetCore.ApiKeyAuthentication.SqlServer
+namespace Csg.AspNetCore.Authentication.ApiKey.SqlServer
 {
     public class SqlServerKeyStore : IApiKeyStore
     {
