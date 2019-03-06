@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <EnableCsgDevRestoreSources>true</EnableCsgDevRestoreSources>
+    <EnableCsgDevRestoreSources>false</EnableCsgDevRestoreSources>
   </PropertyGroup>
   <PropertyGroup>
     <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>

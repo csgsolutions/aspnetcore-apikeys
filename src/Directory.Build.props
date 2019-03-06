@@ -3,6 +3,6 @@
   <Import Project="../build/repo.props"/>
   <Import Project="../build/sources.props"/>
   <ItemGroup>
-    <PackageReference Include="Csg.Build.Metadata.Tasks" PrivateAssets="All" Version="1.0.0-beta-*" />
+    <PackageReference Include="Csg.Build.Metadata.Tasks" PrivateAssets="All" Version="1.0.0" />
   </ItemGroup>
 </Project>
