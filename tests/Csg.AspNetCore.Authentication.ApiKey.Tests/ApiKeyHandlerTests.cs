@@ -171,11 +171,13 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            handler.Options.Events.OnRequestAsync = async (ctx) =>
+            handler.Options.Events.OnRequestAsync = (ctx) =>
             {
                 ctx.AuthenticationType = "ApiKey";
                 ctx.ClientID = "TestName";
                 ctx.Token = "TestKey";
+
+                return System.Threading.Tasks.Task.CompletedTask;
             };
 
             var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -191,9 +193,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            handler.Options.Events.OnAuthenticatedAsync = async (ctx) =>
+            handler.Options.Events.OnAuthenticatedAsync = (ctx) =>
             {
                 ctx.Identity.AddClaim(new System.Security.Claims.Claim("Foo", "Bar"));
+
+                return System.Threading.Tasks.Task.CompletedTask;
             };
 
             context.Request.Headers.Add("Authorization", "ApiKey TestName:TestKey");
