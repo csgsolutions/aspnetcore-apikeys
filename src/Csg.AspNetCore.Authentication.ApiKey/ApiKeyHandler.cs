@@ -125,6 +125,12 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 return AuthenticateResult.Fail(InvalidClientMessage);
             }
 
+            if (string.IsNullOrEmpty(keyFromStore.Secret))
+            {
+                this.Logger.LogInformation("The secret for the given ClientID is null or empty.");
+                return AuthenticateResult.Fail(InvalidClientMessage);
+            }
+
             var keyValidator = this.Options.KeyValidator;
 
             if (requestMessage.AuthenticationType.Equals(AuthTypeBasic, StringComparison.OrdinalIgnoreCase))
