@@ -21,6 +21,14 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             {
                 return Task.FromResult(new ApiKey() { ClientID = "TestName", Secret = "TestKey" });
             }
+            else if (keyName == "NullKey")
+            {
+                return Task.FromResult<ApiKey>(new ApiKey() { ClientID = "BlankKey", Secret = null });
+            }
+            else if (keyName == "BlankKey")
+            {
+                return Task.FromResult<ApiKey>(new ApiKey() { ClientID = "BlankKey", Secret = string.Empty });
+            }
             else
             {
                 return Task.FromResult<ApiKey>(null);

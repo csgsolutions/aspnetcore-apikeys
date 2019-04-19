@@ -12,6 +12,11 @@ namespace Csg.AspNetCore.Authentication.ApiKey
             if (keyFromStore == null) throw new ArgumentNullException(nameof(keyFromStore));
             if (token == null) throw new ArgumentNullException(nameof(token));
 
+            if (keyFromStore.Secret == null)
+            {
+                return Task.FromResult(false);
+            }
+
             //TODO: should do a slow compare
             return Task.FromResult<bool>(keyFromStore.Secret.Equals(token));
         }

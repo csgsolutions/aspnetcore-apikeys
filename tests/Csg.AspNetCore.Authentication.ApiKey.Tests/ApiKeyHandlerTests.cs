@@ -224,5 +224,35 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
         }
 
+        [TestMethod]
+        public async System.Threading.Tasks.Task ApiKeyHandler_BlankSecretIsNotValid()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            context.Request.Headers.Add("Authorization", "ApiKey BlankKey:");
+
+            var authResult = await handler.AuthenticateAsync();
+
+            Assert.IsFalse(authResult.Succeeded);
+
+            Assert.IsFalse(authResult.Succeeded);
+        }
+
+
+        [TestMethod]
+        public async System.Threading.Tasks.Task ApiKeyHandler_NullSecretIsNotValid()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            context.Request.Headers.Add("Authorization", "ApiKey NullKey:");
+            var authResult = await handler.AuthenticateAsync();
+
+            Assert.IsFalse(authResult.Succeeded);
+
+        }
+
+
     }
 }
