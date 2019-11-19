@@ -98,6 +98,39 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
         }
 
         [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithValidStaticTokenInCustomHeader()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            context.Request.Headers.Add("Authorization", "ApiKey TestName:TestKey");
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(true, authResult.Succeeded);
+            Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
+            Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
+        public void ApiKeyHandler_HandleRequestWithValidStaticTokenInQueryString()
+        {
+            var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+            var handler = CreateHandler(context);
+
+            context.Request.Query = new Microsoft.AspNetCore.Http.Internal.QueryCollection(new System.Collections.Generic.Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                { "_apikey", new Microsoft.Extensions.Primitives.StringValues("TestName:TestKey") }
+            });
+
+            var authResult = handler.AuthenticateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            Assert.AreEqual(true, authResult.Succeeded);
+            Assert.AreEqual(true, authResult.Principal.Identity.IsAuthenticated);
+            Assert.AreEqual("TestName", authResult.Principal.Identity.Name);
+        }
+
+        [TestMethod]
         public void ApiKeyHandler_HandleRequestWithValidStaticTokenAlternateCase()
         {
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
@@ -239,7 +272,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.IsFalse(authResult.Succeeded);
         }
 
-
         [TestMethod]
         public async System.Threading.Tasks.Task ApiKeyHandler_NullSecretIsNotValid()
         {
@@ -252,7 +284,6 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             Assert.IsFalse(authResult.Succeeded);
 
         }
-
 
     }
 }

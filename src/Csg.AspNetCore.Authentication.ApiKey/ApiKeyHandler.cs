@@ -30,32 +30,49 @@ namespace Csg.AspNetCore.Authentication.ApiKey
        
         public void GetApiKeyFromRequest(RequestMessageContext messageContext)
         {
-            if (!this.Request.Headers.TryGetValue(AuthorizationHeader, out StringValues headerValue))
+            ReadOnlySpan<char> authType = AuthTypeApiKey.AsSpan();
+            StringValues tokenValue;
+            ReadOnlySpan<char> rawValue;
+
+            // first try the authorization header and then try custom header
+            if (
+                (this.Request.Headers.TryGetValue(AuthorizationHeader, out tokenValue)) ||
+                (this.Options.HeaderName != null && this.Request.Headers.TryGetValue(this.Options.HeaderName, out tokenValue))
+            )
             {
+                rawValue = tokenValue[0].AsSpan();
+                var spaceIndex = rawValue.IndexOf(' ');
+
+                if (spaceIndex <= 0)
+                {
+                    messageContext.NoResult();
+                    return;
+                }
+
+                authType = rawValue.Slice(0, spaceIndex);
+                rawValue = rawValue.Slice(spaceIndex + 1);
+            }
+            // then try query string
+            else if (this.Options.QueryString != null && this.Request.Query.TryGetValue(this.Options.QueryString, out tokenValue))
+            {
+                rawValue = tokenValue[0].AsSpan();
+            }
+            else
+            {
+                // I didn't find a token anywhere, so give up
                 messageContext.NoResult();
                 return;
             }
-
-            var rawHeader = headerValue[0].AsSpan();
-            var indexOfFirstSpace = rawHeader.IndexOf(' ');
-
-            if (indexOfFirstSpace <= 0)
-            {
-                messageContext.NoResult();
-                return;
-            }
-
+            
             var SAuthTypeBasic = AuthTypeBasic.AsSpan();
             var SAuthTypeApiKey = AuthTypeApiKey.AsSpan();
             var SAuthTypeTApiKey = AuthTypeTApiKey.AsSpan();
-            var authType = rawHeader.Slice(0, indexOfFirstSpace);
 
             if (this.Options.HttpBasicEnabled && authType.Equals(SAuthTypeBasic, StringComparison.OrdinalIgnoreCase))
             {
                 this.Logger.LogDebug($"HTTP Basic authentication detected.");
 
-                var valueEncoded = rawHeader.Slice(indexOfFirstSpace + 1);
-                var valueDecoded = System.Text.UTF8Encoding.UTF8.GetString(Convert.FromBase64CharArray(valueEncoded.ToArray(), 0, valueEncoded.Length)).AsSpan();
+                var valueDecoded = System.Text.UTF8Encoding.UTF8.GetString(Convert.FromBase64CharArray(rawValue.ToArray(), 0, rawValue.Length)).AsSpan();
                 var split = valueDecoded.IndexOf(':');
 
                 messageContext.ClientID = valueDecoded.Slice(0, split).ToString();
@@ -63,14 +80,14 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                 messageContext.AuthenticationType = AuthTypeBasic;
 
                 return;
-            }
-                       
-            if ((this.Options.TimeBasedKeyEnabled && authType.Equals(SAuthTypeApiKey, StringComparison.OrdinalIgnoreCase))
-                || (this.Options.StaticKeyEnabled && authType.Equals(SAuthTypeTApiKey, StringComparison.OrdinalIgnoreCase)))
+            } else if (
+                (this.Options.TimeBasedKeyEnabled && authType.Equals(SAuthTypeApiKey, StringComparison.OrdinalIgnoreCase))
+                || (this.Options.StaticKeyEnabled && authType.Equals(SAuthTypeTApiKey, StringComparison.OrdinalIgnoreCase))
+            )
             {
                 this.Logger.LogDebug($"Authorization {authType.ToString()} detected.");
 
-                var indexOfFirstColon = rawHeader.IndexOf(':');
+                var indexOfFirstColon = rawValue.IndexOf(':');
 
                 if (indexOfFirstColon <= 0)
                 {
@@ -78,11 +95,15 @@ namespace Csg.AspNetCore.Authentication.ApiKey
                     return;
                 }
 
-                messageContext.ClientID = rawHeader.Slice(indexOfFirstSpace + 1, indexOfFirstColon - indexOfFirstSpace - 1).ToString();
-                messageContext.Token = rawHeader.Slice(indexOfFirstColon + 1).ToString();
+                messageContext.ClientID = rawValue.Slice(0, indexOfFirstColon).ToString();
+                messageContext.Token = rawValue.Slice(indexOfFirstColon + 1).ToString();
                 messageContext.AuthenticationType = authType.ToString();
 
                 return;
+            }
+            else
+            {
+                messageContext.Fail("Invalid authentication type");
             }
 
             messageContext.NoResult();

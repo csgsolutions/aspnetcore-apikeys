@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{648BA441-31D3-4A16-8970-CE71BEB6FA5F}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{648BA441
 		README.md = README.md
 		build\repo.props = build\repo.props
 		build\sources.props = build\sources.props
-		version.props = version.props
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{51A71DC0-F4E1-4BF8-AF63-C28752AD634C}"
@@ -28,6 +28,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleClient", "src\ExampleClient\ExampleClient.csproj", "{BDCCFBB5-E112-4B5E-8712-570DD916ACA2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ApiKeyGenerator", "src\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.ApiKeyGenerator.csproj", "{2DA7B93E-68D2-42E2-B614-22A7C39CF677}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.AspNetCore.Authentication.ApiKey.KeyVault", "src\Csg.AspNetCore.Authentication.ApiKey.KeyVault\Csg.AspNetCore.Authentication.ApiKey.KeyVault.csproj", "{8CD12E38-17A6-4838-AC6F-6E2431D7F1B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{2DA7B93E-68D2-42E2-B614-22A7C39CF677}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DA7B93E-68D2-42E2-B614-22A7C39CF677}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DA7B93E-68D2-42E2-B614-22A7C39CF677}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CD12E38-17A6-4838-AC6F-6E2431D7F1B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CD12E38-17A6-4838-AC6F-6E2431D7F1B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CD12E38-17A6-4838-AC6F-6E2431D7F1B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CD12E38-17A6-4838-AC6F-6E2431D7F1B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <VersionPrefix>1.0.1</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
-    <PackageVersion Condition="'$(VersionSuffix)' == '' ">$(VersionPrefix)</PackageVersion>
-    <BuildNumber Condition="'$(BuildNumber)' == ''">t0000</BuildNumber>
-    <VersionSuffix Condition="'$(VersionSuffix)' != '' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
-  </PropertyGroup>
-</Project>

@@ -6,7 +6,9 @@ namespace Csg.AspNetCore.Authentication.ApiKey
 {
     public class ApiKeyOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
     {
-        public string HeaderName { get; set; } = "Authorization";
+        public string HeaderName { get; set; } = "ApiKey";
+
+        public string QueryString { get; set; } = "_apikey";
 
         public string AuthenticationType { get; set; } = "ApiKey";
 
