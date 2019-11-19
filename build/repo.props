@@ -4,10 +4,17 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/csgsolutions/aspnetcore-apikeys</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/csgsolutions/aspnetcore-apikeys/blob/master/LICENSE</PackageLicenseUrl>
     <Owner>CSG</Owner>
     <Authors>CSG</Authors>
     <Copyright>2018 Cornerstone Solutions Group</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/csgsolutions/aspnetcore-apikeys</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>false</IncludeSymbols>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/csgsolutions/aspnetcore-apikeys</RepositoryUrl>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
 </Project>
