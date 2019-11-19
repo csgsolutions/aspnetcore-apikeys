@@ -6,7 +6,7 @@
     <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>
     <Owner>CSG</Owner>
     <Authors>CSG</Authors>
-    <Copyright>2018 Cornerstone Solutions Group</Copyright>
+    <Copyright>2019 Cornerstone Solutions Group</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/csgsolutions/aspnetcore-apikeys</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
