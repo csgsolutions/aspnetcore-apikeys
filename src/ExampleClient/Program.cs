@@ -12,14 +12,19 @@ namespace ExampleClient
             var client = new System.Net.Http.HttpClient();
 
             Console.WriteLine("Calling an API using a static API key");
+
             client.AddApiKeyAuthorizationHeader(clientID, secret);
+
             var response = client.GetAsync("http://localhost:5001/api/echo/HelloWorld").ConfigureAwait(false).GetAwaiter().GetResult();
+
             Console.WriteLine($"Response Code: {response.StatusCode}");
             var content = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();
             Console.WriteLine($"Response Content: {content}");
 
             Console.WriteLine("Calling an API using a time-based token generated from the API key");
+            
             client.AddApiKeyAuthorizationHeader(clientID, secret, DateTimeOffset.UtcNow);
+
             response = client.GetAsync("http://localhost:5001/api/echo/HelloWorld").ConfigureAwait(false).GetAwaiter().GetResult();
             Console.WriteLine($"Response Code: {response.StatusCode}");
             content = response.Content.ReadAsStringAsync().ConfigureAwait(false).GetAwaiter().GetResult();

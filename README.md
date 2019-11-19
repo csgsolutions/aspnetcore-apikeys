@@ -5,11 +5,10 @@ A server-side and client-side library for API key authentication with ASP.NET co
 
 # Packages 
 
-| Package | NuGet Stable | NuGet Pre-release | MyGet Dev |
+| Package | NuGet Stable | MyGet Pre-release | MyGet Dev |
 | ------- | ------------ | ----------------- | --------- |
-| Csg.AspNetCore.Authentication.ApiKey | n/a | n/a | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.AspNetCore.Authentication.ApiKey) |
-| Csg.ApiKeyGenerator | n/a | n/a | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.ApiKeyGenerator) |
-
+| Csg.AspNetCore.Authentication.ApiKey | [Link](https://www.nuget.org/packages/Csg.AspNetCore.Authentication.ApiKey/) | [Link](https://www.myget.org/feed/csgsolutions/package/nuget/Csg.AspNetCore.Authentication.ApiKey) | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.AspNetCore.Authentication.ApiKey) |
+| Csg.ApiKeyGenerator | [Link](https://www.nuget.org/packages/Csg.ApiKeyGenerator/) | [Link](https://www.myget.org/feed/csgsolutions/package/nuget/Csg.ApiKeyGenerator) | [Link](https://www.myget.org/feed/csgsolutions-dev/package/nuget/Csg.ApiKeyGenerator) |
 
 # Getting Started
 1.	Install nuget package
@@ -51,9 +50,66 @@ Remember to require authentication on your controller, or [require auth for all 
 public class EchoController : Controller
 ```
 
-# Example Client Usage 
+API ClientID/Secret pairs can be passed in the Authorization Header via Basic or ApiKey/TApiKey authentication, a custom header, or via the query string.
+
+## Authorization Header Format
+```
+Authorization: Basic <base64 value>
+Authorization: ApiKey ClientID:ClientSecret
+Authorization: TApiKey ClientID:<base64 value>
+```
+
+## Custom Header Format
+```
+ApiKey: ApiKey ClientID:ClientSecret
+ApiKey: TApiKey ClientID:<base64 value>
+```
+
+## QueryString Format
+```
+https://example.com/api/widget/?_apikey=ClientID:ClientSecret
+```
+
+## Configuration Options
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name)
+        .AddApiKey(conf => {
+            // enable or disable static keys
+            conf.StaticKeyEnabled = true;
+
+            // enable or disable time-based keys
+            conf.TimeBasedKeyEnabled = true;
+
+            // enable or disable HTTP Basic Authentication
+            conf.HttpBasicEnabled = true;
+            
+            // Change the custom header name
+            conf.HeaderName = "HeaderName";
+            
+            // Disable the custom header
+            conf.HeaderName = null;
+
+            // Change the custom query string parameter
+            conf.QueryString = "param_name";
+
+            // Disable the query string parameter
+            conf.QueryString = null;
+        });
+}
+```
+
+## Using the C# Client Library
+
+[Install the NuGet Package](https://www.nuget.org/packages/Csg.ApiKeyGenerator/).
+
+The ```AddApiKeyAuthorizationHeader``` extension method can be used to generate static and 
+time-based request headers.
 
 See the [full example API project](src/ExampleClient) with working calls to the Example API.
+
 
 ```csharp
 static void Main(string[] args)
@@ -81,15 +137,6 @@ static void Main(string[] args)
 }
 ```
 
-# HTTP Basic Authentication
-The ClientID and Key value can be passed as the Username and Password in a standard HTTP Basic authentication header. You can disable this behavior by setting the ```HttpBasicEnabled``` option to false.
-
-```csharp
-services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey(conf =>
-{
-    conf.HttpBasicEnabled = false;
-});
-```
-
 # Build and Test
  1. build.ps1 / build.cmd will build and run all tests
+

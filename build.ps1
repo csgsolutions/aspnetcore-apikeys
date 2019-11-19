@@ -9,24 +9,19 @@ Param(
 	[string]
 	$BuildToolsVersion = "1.0.0-latest",
 	[switch]
-	$NoTest,
-	[string]
-	$BuildNumber=""
+	$NoTest
 )
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $OutputPackages = @(
-	".\src\Csg.AspNetCore.Authentication.ApiKey\Csg.AspNetCore.Authentication.ApiKey.csproj"
+	".\src\Csg.AspNetCore.Authentication.ApiKey\Csg.AspNetCore.Authentication.ApiKey.csproj",
+	".\src\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.ApiKeyGenerator.csproj"
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
 
 Write-Host "=============================================================================="
 Write-Host "The Build Script"
 Write-Host "=============================================================================="
-
-if ($BuildNumber) {
-	$BuildNumber = $BuildNumber.PadLeft(5, "0")
-}
 
 try {
 	. "$PSScriptRoot/bootstrap.ps1"	
@@ -41,7 +36,7 @@ try {
 
 	# BUILD SOLUTION
 	Write-Host "Performing build..." -ForegroundColor Magenta	
-	dotnet build $SOLUTION --configuration $Configuration /p:BuildNumber=$BuildNumber
+	dotnet build $SOLUTION --configuration $Configuration
 	if ($LASTEXITCODE -ne 0) {
 		throw "Build failed with exit code $LASTEXITCODE."
 	}
@@ -52,7 +47,7 @@ try {
 		foreach ($test_proj in $TestProjects) {
 			Write-Host "Testing $test_proj"			
 			#Note: The --logger parameter is for specifically for mstest to make it output test results
-			dotnet test $test_proj --no-build --configuration $Configuration --logger "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).xml"
+			dotnet test $test_proj --no-build --configuration $Configuration --logger "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).trx"
 			if ($LASTEXITCODE -ne 0) {
 				throw "Test failed with code $LASTEXITCODE"
 			}
@@ -64,7 +59,7 @@ try {
 		Write-Host "Packaging..."  -ForegroundColor Magenta
 		foreach ($pack_proj in $OutputPackages){
 			Write-Host "Packing $pack_proj"
-			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber
+			dotnet pack $pack_proj --no-build --configuration $Configuration
 			if ($LASTEXITCODE -ne 0) {
 				throw "Pack failed with code $result"
 			}

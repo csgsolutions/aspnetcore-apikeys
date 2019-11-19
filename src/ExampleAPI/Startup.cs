@@ -32,22 +32,6 @@ namespace ExampleAPI
                     Version = "1.0"
                 });
 
-                //c.AddSecurityDefinition("ApiKey", new ApiKeyScheme
-                //{
-                //    Description = "Authorization header using the API Key scheme. Example: \"Authorization: ApiKey clientID:secret\"",
-                //    Name = "Authorization",
-                //    In = "header",
-                //    Type = "apiKey"
-                //});
-
-                //c.AddSecurityDefinition("TApiKey", new ApiKeyScheme
-                //{
-                //    Description = "Authorization header using the time-based API Key scheme. Example: \"Authorization: TApiKey clientID:token\"",
-                //    Name = "Authorization",
-                //    In = "header",
-                //    Type = "apiKey"
-                //});
-
                 c.AddSecurityDefinition("Basic", new Swashbuckle.AspNetCore.Swagger.BasicAuthScheme()
                 {
                     Description = "Username is ClientID, password is key."
@@ -63,10 +47,17 @@ namespace ExampleAPI
 
             services.AddConfigurationApiKeyStore();
 
-            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name).AddApiKey(conf =>
-            {
-                conf.HttpBasicEnabled = false;
-            });
+            services.AddAuthentication(Csg.AspNetCore.Authentication.ApiKey.ApiKeyDefaults.Name)
+                .AddApiKey(conf => {
+                    conf.StaticKeyEnabled = true;
+                    conf.HttpBasicEnabled = true;
+                    conf.TimeBasedKeyEnabled = true;
+                    
+                    conf.HeaderName = "HeaderName";
+                    conf.HeaderName = null;
+                    conf.QueryString = "param_name";
+                    conf.QueryString = null;
+                });
 
             services.AddMvc();
         }

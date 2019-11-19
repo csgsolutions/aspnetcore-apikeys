@@ -1,8 +1,7 @@
 <Project>
-  <Import Project="../version.props" />
   <Import Project="../build/repo.props"/>
   <Import Project="../build/sources.props"/>
   <ItemGroup>
-    <PackageReference Include="Csg.Build.Metadata.Tasks" PrivateAssets="All" Version="1.0.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.25" PrivateAssets="All" />
   </ItemGroup>
 </Project>
