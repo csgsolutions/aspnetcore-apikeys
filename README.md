@@ -54,15 +54,15 @@ API ClientID/Secret pairs can be passed in the Authorization Header via Basic or
 
 ## Authorization Header Format
 ```
-Authorization: Basic <base64 value>
+Authorization: Basic <base64 http basic auth string>
 Authorization: ApiKey ClientID:ClientSecret
-Authorization: TApiKey ClientID:<base64 value>
+Authorization: TApiKey ClientID:<time-based-token>
 ```
 
 ## Custom Header Format
 ```
 ApiKey: ApiKey ClientID:ClientSecret
-ApiKey: TApiKey ClientID:<base64 value>
+ApiKey: TApiKey ClientID:<time-based-token>
 ```
 
 ## QueryString Format
@@ -80,7 +80,7 @@ public void ConfigureServices(IServiceCollection services)
             // enable or disable static keys
             conf.StaticKeyEnabled = true;
 
-            // enable or disable time-based keys
+            // enable or disable time-based tokens
             conf.TimeBasedKeyEnabled = true;
 
             // enable or disable HTTP Basic Authentication
@@ -97,6 +97,9 @@ public void ConfigureServices(IServiceCollection services)
 
             // Disable the query string parameter
             conf.QueryString = null;
+
+            // Override the default IApiKeyValidator
+            conf.KeyValidator = new MyCustomValidator();
         });
 }
 ```
@@ -136,6 +139,25 @@ static void Main(string[] args)
     Console.ReadKey();
 }
 ```
+
+# Time-Based Token
+The time-based token provides the most basic of replay-protection.  It prevents requests that may 
+have been captured from being replayed after a short time has elapsed. This is not a robus
+or exhaustive replay protection and is still really only designed with internal (behind a firewall)
+use in mind.
+
+The token is, by default, an HMAC 256 hash of the clientID, using a key
+derived using PBKDF2/RFC2898 with the secret as the password, and the number of 60 second
+intervals since epoch (1970-01-01) as the counter. The hash is then URL-safe Base64 encoded.
+
+```
+counter = epoch_seconds / 60
+key = PBKDF2(secret, counter)
+token = BASE64URL(HMAC256(key, clientID))
+```
+
+This method be changed with a custom algorithm by implementing
+```IKeyValidator``` and setting the ```KeyValidator``` option in startup.
 
 # Build and Test
  1. build.ps1 / build.cmd will build and run all tests
