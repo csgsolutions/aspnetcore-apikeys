@@ -5,7 +5,7 @@
 
 trigger:
 - master
-
+- rel/*
 pool:
   vmImage: 'windows-2019'
 
