@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: PowerShell@1
+  displayName: 'Build + Test'
+  inputs:
+    scriptName: build.ps1
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '**\TEST-*.trx'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  displayName: 'Copy nupkgs'
+  inputs:
+    Contents: '**\bin\**\*.nupkg'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\nupkgs'
+    CleanTargetFolder: true
+    flattenFolders: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: nupkgs'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\nupkgs'
+    ArtifactName: nupkgs
+
