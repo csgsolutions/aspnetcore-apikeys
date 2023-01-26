@@ -118,7 +118,7 @@ namespace Csg.AspNetCore.Authentication.ApiKey.Tests
             var context = new Microsoft.AspNetCore.Http.DefaultHttpContext();
             var handler = CreateHandler(context);
 
-            context.Request.Query = new Microsoft.AspNetCore.Http.Internal.QueryCollection(new System.Collections.Generic.Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            context.Request.Query = new Microsoft.AspNetCore.Http.QueryCollection(new System.Collections.Generic.Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
             {
                 { "_apikey", new Microsoft.Extensions.Primitives.StringValues("TestName:TestKey") }
             });

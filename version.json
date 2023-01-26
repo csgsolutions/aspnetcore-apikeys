@@ -1,6 +1,6 @@
 {
-  "version": "1.1", // required (unless the "inherit" field is set to true and a parent version.json file sets this.)
-  "assemblyVersion": "1.0.0.0", // optional. Use when x.y for AssemblyVersionAttribute differs from the default version property.
+  "version": "2.0", // required (unless the "inherit" field is set to true and a parent version.json file sets this.)
+  "assemblyVersion": "2.0.0.0", // optional. Use when x.y for AssemblyVersionAttribute differs from the default version property.
   "nugetPackageVersion": {
     "semVer": 1 // optional. Set to either 1 or 2 to control how the NuGet package version string is generated. Default is 1.
   },

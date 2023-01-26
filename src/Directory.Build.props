@@ -2,6 +2,6 @@
   <Import Project="../build/repo.props"/>
   <Import Project="../build/sources.props"/>
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.0.25" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.119" PrivateAssets="All" />
   </ItemGroup>
 </Project>
