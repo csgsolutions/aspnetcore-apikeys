@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace ExampleAPI
@@ -24,22 +25,33 @@ namespace ExampleAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info()
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
                 {
                     Title = "ExampleAPI",
                     Version = "1.0"
                 });
 
-                c.AddSecurityDefinition("Basic", new Swashbuckle.AspNetCore.Swagger.BasicAuthScheme()
-                {
-                    Description = "Username is ClientID, password is key."
-                });
+                var basicScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+                {                    
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "Basic",
+                    In =  Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Username is ClientID, password is key.",
+                    Reference = new OpenApiReference
+                    {
+                        Id = "Basic",
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
 
-                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>()
+                c.AddSecurityDefinition(basicScheme.Reference.Id, basicScheme);
+                c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
                 {
-                    { "Basic", new string[]{ } }
+                    { basicScheme, new string[]{ } }
                 });
             });
 
@@ -70,6 +82,12 @@ namespace ExampleAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
             app.UseSwagger();
 
             app.UseSwaggerUI(c =>
@@ -77,9 +95,10 @@ namespace ExampleAPI
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ExampleAPI V1");
             });
 
-            app.UseAuthentication();
-
-            app.UseMvc();
+            app.UseEndpoints(ep =>
+            {
+                ep.MapControllers();
+            });
         }
     }
 }
